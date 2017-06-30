@@ -97,24 +97,27 @@ def match(param):
 
 def fileMatch(param):
     pwd = os.getcwd()
-    fw = open(pwd+"/static/files/result.csv", "w")
-    param = param.replace('\r\n','\n').split('\n')
-    while param:
-        line = param.pop()
-        biz = line.split(',')[-16]
-        name = biz.split(';')[0].split('；')[0].split('。')[0].split('、')[0].split('：')[0].split('（')[0].split('(')[0].split('，')[0]
-        max = 0
-        maxId = 0
-        for key,value in classDDict.items():
-            sim = getMatchResult(value, name)
-            if sim > max:
-                max = sim
-                maxId = key
+    try:
+        fw = open(pwd+"/static/files/result.csv", "w")
+        param = param.replace('\r\n','\n').split('\n')
+        while param:
+            line = param.pop()
+            biz = line.split(',')[-16]
+            name = biz.split(';')[0].split('；')[0].split('。')[0].split('、')[0].split('：')[0].split('（')[0].split('(')[0].split('，')[0]
+            max = 0
+            maxId = 0
+            for key,value in classDDict.items():
+                sim = getMatchResult(value, name)
+                if sim > max:
+                    max = sim
+                    maxId = key
 
-        fw.write(line + getAll(maxId) + '\n')
+            fw.write(line + getAll(maxId) + '\n')
 
-    fw.close()
-    return "result.csv"    
+        fw.close()
+        return "result.csv"    
+    except:
+        return "error"
 
 with open('controllers/jieba_dict/stopwords.txt','r') as sw:
     for line in sw:
