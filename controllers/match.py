@@ -97,7 +97,7 @@ def match(param):
 
 def fileMatch(param):
     pwd = os.getcwd()
-    fw = open(pwd+"/../static/files/result.csv", "w")
+    fw = open(pwd+"/static/files/result.csv", "w")
     param = param.replace('\r\n','\n').split('\n')
     while param:
         line = param.pop()
