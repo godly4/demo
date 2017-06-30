@@ -2,6 +2,7 @@
 #coding: utf-8
 #author: dlgao
 
+import os
 import jieba
 from gensim.models import word2vec
 from gensim import models
@@ -93,7 +94,28 @@ def match(param):
             maxId = key
     
     return getAll(maxId)
-    
+
+def fileMatch(param):
+    pwd = os.getcwd()
+    fw = open(pwd+"/../static/files/result.csv", "w")
+    param = param.replace('\r\n','\n').split('\n')
+    while param:
+        line = param.pop()
+        biz = line.split(',')[-16]
+        name = biz.split(';')[0].split('；')[0].split('。')[0].split('、')[0].split('：')[0].split('（')[0].split('(')[0].split('，')[0]
+        max = 0
+        maxId = 0
+        for key,value in classDDict.items():
+            sim = getMatchResult(value, name)
+            if sim > max:
+                max = sim
+                maxId = key
+
+        fw.write(line + getAll(maxId) + '\n')
+
+    fw.close()
+    return "result.csv"    
+
 with open('controllers/jieba_dict/stopwords.txt','r') as sw:
     for line in sw:
         stopwordset.add(line.strip('\n'))

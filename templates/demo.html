@@ -58,7 +58,9 @@ $def with (name)
     <label style="font-size:20px" for="submitText">待解析内容</label>
     <hr/>
     <textarea style="margin:5px 10px" name="submitText" id="submitText" class="form-control" rows="5"></textarea>
-    <button style="float:right" class="btn btn-info" onclick="parse()">提交</button>
+    <button style="float:right;margin:2px" class="btn btn-info" onclick="parse()">提交</button>
+    <button style="float:right;margin:2px" class="btn btn-success" type="button" onclick="$$('#input_file').click()">上传</button>
+    <input type="file" id="input_file" style="opacity:0">
 </div>
 <div  style="padding:5px;clear:both">
     <label style="font-size:20px" for="submitText">解析结果</label>
@@ -69,28 +71,45 @@ $def with (name)
 </div>
 </body>
 <script>
-function parse(){
-    var value = $$("#submitText").val();
-    var postData = {
-        "data" : value,
-    };
+$$(document).ready(function(){
+    $$("#input_file").change(function(){
+        var files = this.files;
+        parse(files[0]);
+    });
+});
+function parse(value){
+    if (!value){
+        url = "/classify";
+        value = $$("#submitText").val();
+    }
+    else{
+        url = "/upload";   
+    }
+    var formData = new FormData();
+    formData.append("data", value);
+
     $$.ajax({
-        url: "/classify",
+        url: url,
         type: "post",
-        data: postData,
+        data: formData,
         dataType: "json",
+        processData:false,                
+        contentType:false,
         beforeSend: function(){
             $$("#desc")[0].innerHTML = "解析中";
         },
         success: function(data){
             $$("#descDiv").attr("style", "background-color:yellowgreen");
             var list = data.split(',');
-            if (list.length != 4)
+            if (list.length != 4 && data != "result.csv")
                 $$("#desc")[0].innerHTML = "解析失败";
-            else{
+            else if(list.length == 4){
                 var str = "第一类：" + list[3] + "<br/>" + "第二类："+ list[2]
                             + "<br/>" + "第三类：" + list[1] + "<br/>" + "第四类：" + list[0];
                 $$("#desc")[0].innerHTML = str;
+            }
+            else{
+                $$("#desc")[0].innerHTML = "<a href='http://localhost:9000/static/files/result.csv'>结果文件</a>";
             }
         },
     });

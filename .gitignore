@@ -1,3 +1,4 @@
 *.pyc
 med250*
 *.log
+*.pid

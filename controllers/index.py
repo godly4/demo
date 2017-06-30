@@ -1,7 +1,7 @@
 import web
 import json
 from config.setting import render
-from match import match 
+from match import match, fileMatch 
 
 class Index:
     def GET(self):
@@ -16,4 +16,10 @@ class Parse:
         i = web.input()
         result = match(i.data)
         print result
+        return json.dumps(result)
+
+class Upload:
+    def POST(self):
+        i = web.input()
+        result = fileMatch(i.data)
         return json.dumps(result)
