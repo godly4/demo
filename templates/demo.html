@@ -1,4 +1,4 @@
-$def with (name)
+$def with (fileList)
 <head>
     <title>Demo页面</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -23,20 +23,8 @@ $def with (name)
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Main <span class="sr-only">(current)</span></a></li>
-        <li><a href="#">About</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">One more separated link</a></li>
-          </ul>
-        </li>
+        <li class="active"><a href="#main">Main</a></li>
+        <li><a href="#moran">Moran</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#">User</a></li>
@@ -54,24 +42,58 @@ $def with (name)
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-<div class="form-group" style="padding-right:20px;padding-left:5px">
-    <label style="font-size:20px" for="submitText">待解析内容</label>
-    <hr/>
-    <textarea style="margin:5px 10px" name="submitText" id="submitText" class="form-control" rows="5"></textarea>
-    <button style="float:right;margin:2px" class="btn btn-info" onclick="parse()">提交</button>
-    <button style="float:right;margin:2px" class="btn btn-success" type="button" onclick="$$('#input_file').click()">上传</button>
-    <input type="file" id="input_file" style="opacity:0">
-</div>
-<div  style="padding:5px;clear:both">
-    <label style="font-size:20px" for="submitText">解析结果</label>
-    <hr/>
-    <div id="descDiv">
-        <label id="desc" style="text-align:left"></label>
+<div id="divList">
+    <div id="main">
+        <div class="form-group" style="padding-right:20px;padding-left:5px">
+            <label style="font-size:20px" for="submitText">待解析内容</label>
+            <hr/>
+            <textarea style="margin:5px 10px" name="submitText" id="submitText" class="form-control" rows="5"></textarea>
+            <button style="float:right;margin:2px" class="btn btn-info" onclick="parse()">提交</button>
+            <button style="float:right;margin:2px" class="btn btn-success" type="button" onclick="$$('#input_file').click()">上传</button>
+            <input type="file" id="input_file" style="opacity:0">
+        </div>
+        <div  style="padding:5px;clear:both">
+            <label style="font-size:20px" for="submitText">解析结果</label>
+            <hr/>
+            <div id="descDiv">
+                <label id="desc" style="text-align:left"></label>
+            </div>
+        </div>
+    </div>
+    <div id="moran" style="display:none">
+        <div class="form-group" style="padding-right:20px;padding-left:5px">
+            <label style="font-size:20px" for="submitText">SHP文件</label>
+            <label style="font-size:20px;padding-left:48%">字段名</label>
+            <hr/>
+            <select id="shpfile" class="form-control" onchange="parseDBF(this)" style="width:45%;display:inline">
+                <option value="noselect">---请选择---</option>
+                $for file in fileList:
+                    <option value="${file}">${file}</option>   
+            </select>
+            <select id="column" class="form-control" style="width:45%;float:right;display:inline">
+                <option value="noselect">---请选择---</option>
+            </select>
+            <button class="btn btn-success" type="button" style="display: block;float: right;clear: both;margin-top: 20px;" onclick="calculate()">计算</button>
+        </div>
     </div>
 </div>
 </body>
 <script>
 $$(document).ready(function(){
+    $$("ul[class='nav navbar-nav'] li a").each(function(){
+        this.onclick = function(){
+            link = this.hash.substr(1);
+            $$("#divList>div").each(function(){
+                if(this.id != link){
+                    this.style.display = "none";
+                }
+                else{
+                    this.style.display = "block";
+                }
+            })    
+        };
+    });
+
     $$("#input_file").change(function(){
         var files = this.files;
         parse(files[0]);
@@ -113,5 +135,46 @@ function parse(value){
             }
         },
     });
+}
+function parseDBF(that){
+    console.log(that.value);
+    url = "/column";
+    formData = new FormData();
+    formData.append("name", that.value);
+    $$.ajax({
+        url: url,
+        type: "post",
+        data: formData,
+        dataType: "json",
+        processData:false,
+        contentType:false,
+        success: function(data){
+            for(i=0;i<data.length;i++){
+                var node = document.createElement("option");
+                node.setAttribute("value",data[i]);
+                node.innerHTML = data[i];
+                $$("#column")[0].appendChild(node); 
+            }
+        },
+    });
+}
+function calculate(){
+    formData = new FormData();
+    var shpName = $$("#shpfile")[0].value;
+    var col = $$("#column")[0].value;
+    formData.append("shp", shpName);
+    formData.append("col", col);
+    url = "/calculate";
+    $$.ajax({
+        url: url,
+        type: "post",
+        data: formData,
+        dataType: "json",
+        processData:false,
+        contentType:false,
+        success: function(data){
+            console.log(data);
+        },
+    });     
 }
 </script>
