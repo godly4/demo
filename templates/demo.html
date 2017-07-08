@@ -75,6 +75,13 @@ $def with (fileList)
             </select>
             <button class="btn btn-success" type="button" style="display: block;float: right;clear: both;margin-top: 20px;" onclick="calculate()">计算</button>
         </div>
+        <div  style="padding:5px;clear:both">
+            <label style="font-size:20px" for="parseText">解析结果</label>
+            <hr/>
+            <div id="parseDiv">
+                <label id="parse" style="text-align:left"></label>
+            </div>
+        </div>
     </div>
 </div>
 </body>
@@ -174,6 +181,7 @@ function calculate(){
         contentType:false,
         success: function(data){
             console.log(data);
+            $$("#parse")[0].innerHTML = str;
         },
     });     
 }

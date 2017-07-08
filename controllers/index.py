@@ -49,6 +49,7 @@ class Calc:
         path = os.getcwd() + "/static/files/shp/"+ shp + ".dbf"
         f = pysal.open(path, "r")
         y = np.array(f.by_col[col])
-        w = pysal.open(pysal.examples.get_path("stl.gal")).read()
+        #w = pysal.open(pysal.examples.get_path("stl.gal")).read()
+        w = pysal.open(os.getcwd() + "/static/files/shp/"+ shp + ".gal").read()
         mi = pysal.Moran(y, w, two_tailed=False)
         return json.dumps("%.3f"%mi.I, "%.5f"%mi.p_norm, "%.5f"%mi.z_norm)
