@@ -95,11 +95,23 @@ class Calc:
             dbfNew.addField(
                 (fldName, "C", 15)
             )
+        dbfNew.addField(
+            ("CL", "C", 15),
+            ("I", "C", 15),
+            ("P", "C", 15),
+            ("Z", "C", 15)
+        )
         #add data
+        index = 0
         for rec in dbf:
             newRec = dbfNew.newRecord()
             for fldName in dbf.fieldNames:
                 newRec[fldName] = rec[fldName]
+            newRec["CL"] = lm_cl[index]
+            newRec["I"] = lm_I[index]
+            newRec["P"] = lm_P[index]
+            newRec["Z"] = lm_Z[index]
+            index += 1
             newRec.store()
         dbf.close()
         dbfNew.close() 
