@@ -182,6 +182,7 @@ function calculate(){
         success: function(data){
             console.log(data);
             $$("#parse")[0].innerHTML =  data;
+            $$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
         },
     });     
 }

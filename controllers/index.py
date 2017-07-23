@@ -7,6 +7,8 @@ import web
 import json
 import pysal
 import numpy as np
+import shutil
+import subprocess
 from dbfpy.dbf import Dbf
 from config.setting import render
 from match import match, fileMatch 
@@ -54,7 +56,20 @@ class Calc:
         i = web.input()
         shp = i.shp.encode('utf-8')
         col = i.col.encode('utf-8')
+        # FOR download, mkdir 
+        cmd = "rm -rf static/files/"+shp
+        subprocess.call(cmd, shell=True)
+        cmd = "rm -rf static/files/"+shp+".zip"
+        subprocess.call(cmd, shell=True)
+        os.chdir("static/files/")
+        os.mkdir(shp)
+        os.chdir(shp)
+        cmd = "find ../shp/ -name "+shp+".* -exec cp {} . \;"
+        subprocess.call(cmd,shell=True) 
+        os.chdir("../../..")
+        # start execute
         path = os.getcwd() + "/static/files/shp/"+ shp + ".dbf"
+        print path
         f = pysal.open(path, "r")
         y = np.array(f.by_col[col])
         #w = pysal.open(pysal.examples.get_path("stl.gal")).read()
@@ -68,25 +83,6 @@ class Calc:
         lm_P = lm.p_sim
         lm_Z = lm.z_sim
         print lm_cl, lm_I, lm_P, lm_Z
-        #添加cl, i, p, z列
-        #with dbf.Table(path) as db:
-        #    dbf.export(db, 'tmp.csv')
-        #header = ""
-        #with open('tmp.csv', 'r') as f:
-        #    with open("result.csv", "w") as fw:
-        #        index = 0
-        #        line = f.readline().strip()
-        #        line = line + ',CL,I,P,Z'
-        #        header = line.replace('"', '')
-        #        #fw.write(header+'\n')
-        #        line = f.readline().strip()
-        #        while line:
-        #            line = line + ',{0},{1},{2},{3}'.format(lm_cl[index], lm_I[index], lm_P[index], lm_Z[index])
-        #            fw.write(line.replace('"', '')+'\n')
-        #            index += 1
-        #            line = f.readline().strip()
-        #os.remove('tmp.csv')
-        ##table = dbf.from_csv(csvfile="result.csv",to_disk=True,field_names=header.split(','))
         #table = dbf.from_csv(csvfile="result.csv",field_names=header.split(','),to_disk=True)
         dbf =  Dbf(path, True) 
         dbfNew = Dbf("result.dbf", new=True) 
@@ -115,6 +111,10 @@ class Calc:
             newRec.store()
         dbf.close()
         dbfNew.close() 
+        # 开启压缩
+        cmd = "mv -f result.dbf static/files/"+shp+"/"+shp+".dbf"
+        subprocess.call(cmd, shell=True)
+        shutil.make_archive("static/files/"+shp, "zip", root_dir="static/files/"+shp)
         #db.delete_fields('cl')
         #db.delete_fields('i')
         #db.delete_fields('p')
