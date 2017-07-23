@@ -5,3 +5,4 @@ med250*
 *.pid
 static/files
 *.DS_Store
+*.dbf
