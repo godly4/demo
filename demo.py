@@ -6,6 +6,7 @@ urls = (
     '/upload', 'controllers.index.Upload',
     '/column', 'controllers.index.Column',
     '/calculate', 'controllers.index.Calc',
+    '/regress', 'controllers.index.Regress',
 )
 
 render = web.template.render("templates/")

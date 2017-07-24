@@ -51,6 +51,26 @@ def delete(db, col):
     except:
         pass
 
+class Regress:
+    def POST(self):
+        i = web.input()
+        shp = i.shp.encode('utf-8')
+        colY = i.colY.encode('utf-8')
+        colX = i.colX.encode('utf-8')
+        print colX
+        # start execute
+        path = os.getcwd() + "/static/files/shp/"+ shp + ".dbf"
+        f = pysal.open(path, "r")
+        y = np.array(f.by_col[colY])
+        y.shape = (len(f.by_col[colY]), 1)
+        X = []
+        for elem in colX.split(','):
+            X.append(f.by_col[elem])
+        X = np.array(X).T
+        ols = pysal.spreg.ols.OLS(y, X)
+        print ols.summary
+        return json.dumps(ols.summary)
+
 class Calc:
     def POST(self):
         i = web.input()
@@ -115,19 +135,4 @@ class Calc:
         cmd = "mv -f result.dbf static/files/"+shp+"/"+shp+".dbf"
         subprocess.call(cmd, shell=True)
         shutil.make_archive("static/files/"+shp, "zip", root_dir="static/files/"+shp)
-        #db.delete_fields('cl')
-        #db.delete_fields('i')
-        #db.delete_fields('p')
-        #db.delete_fields('z')
-        #db.add_fields('CL N(128,3)')
-        #db.add_fields('I N(128,3)')
-        #db.add_fields('P N(128,3)')
-        #db.add_fields('Z N(128,3)')
-        #for record in db:
-        #    record.CL = lm_cl[index]
-        #    record.I = lm_I[index]
-        #    record.P = lm_P[index]
-        #    record.Z = lm_Z[index]
-        #    index += 1
-        #db.pack()
         return json.dumps(result)
