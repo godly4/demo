@@ -3,6 +3,5 @@
 med250*
 *.log
 *.pid
-static/files
 *.DS_Store
 *.dbf
