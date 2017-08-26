@@ -13,17 +13,26 @@ from dbfpy.dbf import Dbf
 from config.setting import render
 #from match import match, fileMatch 
 
+def getFileList():
+    pwd = os.getcwd()
+    shpDir = pwd + "/static/files/shp"
+    fileList = os.listdir(shpDir)
+    dbfList = []
+    for f in fileList:
+        if os.path.splitext(f)[1] == '.dbf':
+            dbfList.append(os.path.splitext(f)[0])
+
+    return dbfList
+
 class Index:
     def GET(self):
-        pwd = os.getcwd()
-        shpDir = pwd + "/static/files/shp"
-        fileList = os.listdir(shpDir)
-        dbfList = []
-        for f in fileList:
-            if os.path.splitext(f)[1] == '.dbf':
-                dbfList.append(os.path.splitext(f)[0])
-        
-        return render.demo(dbfList)
+        dbfList = getFileList()
+        return render.index(dbfList)
+
+class SpatialLocal:
+    def GET(self):
+        dbfList = getFileList()
+        return render.spatialLocal(dbfList)
 
 class Parse:
     def POST(self):
