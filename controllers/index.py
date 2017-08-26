@@ -11,7 +11,7 @@ import shutil
 import subprocess
 from dbfpy.dbf import Dbf
 from config.setting import render
-from match import match, fileMatch 
+#from match import match, fileMatch 
 
 class Index:
     def GET(self):
@@ -61,12 +61,13 @@ class Regress:
         # start execute
         path = os.getcwd() + "/static/files/shp/"+ shp + ".dbf"
         f = pysal.open(path, "r")
-        y = np.array(f.by_col[colY])
+        y = np.array(f.by_col[colY]).astype(np.float)
         y.shape = (len(f.by_col[colY]), 1)
         X = []
         for elem in colX.split(','):
             X.append(f.by_col[elem])
         X = np.array(X).T
+        X = X.astype(np.float)
         ols = pysal.spreg.ols.OLS(y, X)
         print ols.summary
         return json.dumps(ols.summary)
@@ -91,7 +92,7 @@ class Calc:
         path = os.getcwd() + "/static/files/shp/"+ shp + ".dbf"
         print path
         f = pysal.open(path, "r")
-        y = np.array(f.by_col[col])
+        y = np.array(f.by_col[col]).astype(np.float)
         #w = pysal.open(pysal.examples.get_path("stl.gal")).read()
         w = pysal.open(os.getcwd() + "/static/files/shp/"+ shp + ".gal").read()
         np.random.seed(12345)
