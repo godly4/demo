@@ -10,6 +10,7 @@ urls = (
     '/spatialLocal', 'controllers.index.SpatialLocal',
     '/spatialGlobal', 'controllers.index.SpatialGlobal',
     '/getisLocal', 'controllers.index.GetisLocal',
+    '/netAnalysis', 'controllers.index.NetAnalysis',
 )
 
 render = web.template.render("templates/")

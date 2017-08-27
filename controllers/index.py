@@ -44,6 +44,10 @@ class SpatialGlobal:
         dbfList = getFileList()
         return render.spatialGlobal(dbfList)
 
+class NetAnalysis:
+    def GET(self):
+        return render.netAnalysis()
+
 class Parse:
     def POST(self):
         i = web.input()
