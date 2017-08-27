@@ -145,4 +145,7 @@ class Calc:
         cmd = "mv -f result.dbf static/files/"+shp+"/"+shp+".dbf"
         subprocess.call(cmd, shell=True)
         shutil.make_archive("static/files/"+shp, "zip", root_dir="static/files/"+shp)
+        # 传输至118机器
+        cmd = "scp result.dbf Administrator@118.190.61.45:/C:/gisdata/" + shp
+        subprocess.call(cmd, shell=True)
         return json.dumps(result)

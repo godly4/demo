@@ -58,24 +58,43 @@ $def with (fileList)
                         </li>
                         <li>
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 现状评价<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="xx">信息熵</a>
+                                </li>
+                                <li>
+                                    <a href="xy">区位熵</a>
+                                </li>
+                                <li>
+                                    <a href="spatialLocal">SP指数</a>
+                                </li>
+                            </ul> 
                         </li>
                         <li>
                             <a href="tables.html"><i class="fa fa-table fa-fw"></i> 潜力评价<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="xx">空间热力评价</a>
+                                    <a href="xx">空间热点分析</a>
                                 </li>
                                 <li>
-                                    <a href="xy">空间A评价</a>
+                                    <a href="xy">空间自相关</a>
                                 </li>
                                 <li>
-                                    <a href="spatialLocal">空间B评价</a>
+                                    <a href="spatialLocal">空间聚类分析</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
                         <li>
-                            <a href="forms.html"><i class="fa fa-edit fa-fw"></i> 相互关系</a>
+                            <a href="forms.html"><i class="fa fa-edit fa-fw"></i> 相关模型<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="xx">回归</a>
+                                </li>
+                                <li>
+                                    <a href="xy">网络分析</a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -87,6 +106,11 @@ $def with (fileList)
         <div id="page-wrapper">
             <div class="row">
                 <div id="moran">
+                    <div style="padding-right:20px;padding-left:5px;padding-top:35px">
+                        <label style="font-size:20px">原理介绍</label>
+                        <hr>
+                        <h5>1234567</h5>
+                    </div>
                     <div class="form-group" style="padding-right:20px;padding-left:5px;padding-top:35px">
                         <label style="font-size:20px" for="submitText">SHP文件</label>
                         <label style="font-size:20px;padding-left:48%">字段名</label>
@@ -171,9 +195,9 @@ $def with (fileList)
             contentType:false,
             success: function(data){
                 console.log(data);
-                $$("#parse")[0].innerHTML =  data;
-                $$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
-                $$("#parse")[0].innerHTML += "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=597&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+                //$$("#parse")[0].innerHTML =  data;
+                //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
+                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=597&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
             },
         });     
     }
