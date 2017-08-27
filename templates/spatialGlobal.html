@@ -109,7 +109,7 @@ $def with (fileList)
                     <div style="padding-right:20px;padding-left:5px;padding-top:35px">
                         <label style="font-size:20px">原理介绍</label>
                         <hr>
-                        <h5>1234567</h5>
+                        <h5>空间自相关工具将返回五个值：Moran's I 指数、预期指数、方差、z 得分及 p 值。在给定一组要素及相关属性的情况下，该工具评估所表达的模式是聚类模式、离散模式还是随机模式。使用 z 得分或 p 值指示统计显著性时，如果 Moran's I 指数值为正则指示聚类趋势，如果 Moran's I 指数值为负则指示离散趋势。该工具通过计算 z 得分和 p 值来表示您是否可以拒绝零假设。此种情况下，零假设表示要素值随机分布于研究区域中。z 得分基于随机化零假设进行计算。输入字段应包含多种值。此统计数学方法要求待分析的变量存在一定程度的变化；例如，如果所有输入都是 1 便无法求解。如果要使用此工具分析事件数据的空间模式，应考虑聚合事件数据。优化的热点分析还可以用来分析事件数据的空间模式。</h5>
                     </div>
                     <div class="form-group" style="padding-right:20px;padding-left:5px;padding-top:35px">
                         <label style="font-size:20px" for="submitText">SHP文件</label>
@@ -195,9 +195,9 @@ $def with (fileList)
             contentType:false,
             success: function(data){
                 console.log(data);
-                //$$("#parse")[0].innerHTML =  data;
+                $$("#parse")[0].innerHTML =  data;
                 //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
-                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=597&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+                //$$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=597&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
             },
         });     
     }

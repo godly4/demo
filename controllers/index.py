@@ -34,6 +34,16 @@ class SpatialLocal:
         dbfList = getFileList()
         return render.spatialLocal(dbfList)
 
+class GetisLocal:
+    def GET(self):
+        dbfList = getFileList()
+        return render.getisLocal(dbfList)
+
+class SpatialGlobal:
+    def GET(self):
+        dbfList = getFileList()
+        return render.spatialGlobal(dbfList)
+
 class Parse:
     def POST(self):
         i = web.input()
@@ -105,14 +115,20 @@ class Calc:
         #w = pysal.open(pysal.examples.get_path("stl.gal")).read()
         w = pysal.open(os.getcwd() + "/static/files/shp/"+ shp + ".gal").read()
         np.random.seed(12345)
+        # 计算全局Moran值
         mi = pysal.Moran(y, w, two_tailed=False)
+        # 计算局部Moran值
         lm = pysal.Moran_Local(y, w, permutations=9999) 
+        # 计算局部Getis值
+        lg = pysal.esda.getisord.G_Local(y, w, permutations=9999) 
         result = "Moran I值：{0}，P值：{1}，Z值：{2}".format(mi.I, mi.p_norm, mi.z_norm)
         lm_cl = lm.q
         lm_I = lm.Is
         lm_P = lm.p_sim
         lm_Z = lm.z_sim
-        print lm_cl, lm_I, lm_P, lm_Z
+        lg_P = lg.p_sim
+        lg_Z = lg.z_sim
+        print lm_cl, lm_I, lm_P, lm_Z, lg_P, lg_Z
         #table = dbf.from_csv(csvfile="result.csv",field_names=header.split(','),to_disk=True)
         dbf =  Dbf(path, True) 
         dbfNew = Dbf("result.dbf", new=True) 
@@ -122,10 +138,12 @@ class Calc:
                 (fldName, "C", 15)
             )
         dbfNew.addField(
-            ("CL", "C", 15),
-            ("I", "C", 15),
-            ("P", "C", 15),
-            ("Z", "C", 15)
+            ("Moran_CL", "C", 15),
+            ("Moran_I", "C", 15),
+            ("Moran_P", "C", 15),
+            ("Moran_Z", "C", 15),
+            ("Getis_P", "C", 15),
+            ("Getis_Z", "C", 15),
         )
         #add data
         index = 0
@@ -133,16 +151,18 @@ class Calc:
             newRec = dbfNew.newRecord()
             for fldName in dbf.fieldNames:
                 newRec[fldName] = rec[fldName]
-            newRec["CL"] = lm_cl[index]
-            newRec["I"] = lm_I[index]
-            newRec["P"] = lm_P[index]
-            newRec["Z"] = lm_Z[index]
+            newRec["Moran_CL"] = lm_cl[index]
+            newRec["Moran_I"] = lm_I[index]
+            newRec["Moran_P"] = lm_P[index]
+            newRec["Moran_Z"] = lm_Z[index]
+            newRec["Getis_P"] = lg_P[index]
+            newRec["Getis_Z"] = lg_Z[index]
             index += 1
             newRec.store()
         dbf.close()
         dbfNew.close() 
         # 传输至118机器
-        cmd = "scp result.dbf Administrator@118.190.61.45:/C:/gisdata/" + shp
+        cmd = "scp result.dbf Administrator@118.190.61.45:/C:/gisdata/" + shp + "/" + shp + ".dbf"
         subprocess.call(cmd, shell=True)
         # 开启压缩
         cmd = "mv -f result.dbf static/files/"+shp+"/"+shp+".dbf"

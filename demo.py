@@ -8,6 +8,8 @@ urls = (
     '/calculate', 'controllers.index.Calc',
     '/regress', 'controllers.index.Regress',
     '/spatialLocal', 'controllers.index.SpatialLocal',
+    '/spatialGlobal', 'controllers.index.SpatialGlobal',
+    '/getisLocal', 'controllers.index.GetisLocal',
 )
 
 render = web.template.render("templates/")
