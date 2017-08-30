@@ -12,6 +12,7 @@ urls = (
     '/getisLocal', 'controllers.index.GetisLocal',
     '/netAnalysis', 'controllers.index.NetAnalysis',
     '/entropy', 'controllers.index.Entropy',
+    '/calc_entropy', 'controllers.index.CalcEntropy',
 )
 
 render = web.template.render("templates/")

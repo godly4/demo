@@ -1,0 +1,217 @@
+$def with (fileList)
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>京津冀科技资源创新</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="static/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="static/css/font-awesome.css" rel="stylesheet" type="text/css">
+
+    <!-- MetisMenu CSS -->
+    <link href="static/css/metisMenu.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">京津冀项目</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a href="index"><i class="fa fa-dashboard fa-fw"></i> 主页</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 现状评价<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="entropy">信息熵</a>
+                                </li>
+                                <li>
+                                    <a href="xy">区位熵</a>
+                                </li>
+                                <li>
+                                    <a href="spatialLocal">SP指数</a>
+                                </li>
+                            </ul> 
+                        </li>
+                        <li>
+                            <a href="tables.html"><i class="fa fa-table fa-fw"></i> 潜力评价<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="getisLocal">空间热点分析</a>
+                                </li>
+                                <li>
+                                    <a href="spatialGlobal">空间自相关</a>
+                                </li>
+                                <li>
+                                    <a href="spatialLocal">空间聚类分析</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="forms.html"><i class="fa fa-edit fa-fw"></i> 相关模型<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="xx">回归</a>
+                                </li>
+                                <li>
+                                    <a href="netAnalysis">网络分析</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <div id="page-wrapper">
+            <div class="row">
+                <div id="moran">
+                    <div style="padding-right:20px;padding-left:5px;padding-top:35px">
+                        <label style="font-size:20px">原理介绍</label>
+                        <hr>
+                        <h5>在信息论中，熵是接收的每条消息中包含的信息的平均量，又被稱為信息熵、信源熵、平均自信息量。 这里，“消息”代表来自分布或数据流中的事件、样本或特征。（ 熵最好理解为不确定性的量度而不是确定性的量度，因为越随机的信源的熵越大。） 来自信源的另一个特征是样本的概率分布。</h5>
+                    </div>
+                    <div class="form-group" style="padding-right:20px;padding-left:5px;padding-top:35px">
+                        <label style="font-size:20px" for="submitText">SHP文件</label>
+                        <label style="font-size:20px;padding-left:48%">字段名</label>
+                        <hr/>
+                        <select id="shpfile" class="form-control" onchange="parseDBF(this)" style="width:45%;display:inline">
+                            <option value="noselect">---请选择---</option>
+                            $for file in fileList:
+                                <option value="${file}">${file}</option>   
+                        </select>
+                        <select id="column" class="form-control" style="width:45%;float:right;display:inline" multiple="multiple">
+                            <option value="noselect">---请选择---</option>
+                        </select>
+                        <button class="btn btn-success" type="button" style="display: block;float: right;clear: both;margin-top: 20px;" onclick="calculate()">计算</button>
+                    </div>
+                    <div  style="padding:5px;clear:both">
+                        <label style="font-size:20px" for="parseText">解析结果</label>
+                        <hr/>
+                        <div id="parseDiv">
+                            <label id="parse" style="text-align:left"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="static/js/jquery-3.2.1.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="static/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="static/js/metisMenu.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="static/js/sb-admin-2.min.js"></script>
+
+    <script>
+    function parseDBF(that){
+        console.log(that.value);
+        url = "/column";
+        formData = new FormData();
+        formData.append("name", that.value);
+        formData.append("dirName", "curemark");
+        $$.ajax({
+            url: url,
+            type: "post",
+            data: formData,
+            dataType: "json",
+            processData:false,
+            contentType:false,
+            beforeSend: function(){
+                var list = new Array();
+                clearChildren(list);
+            },
+            success: function(data){
+                for(i=0;i<data.length;i++){
+                    node = document.createElement("option");
+                    node.setAttribute("value",data[i]);
+                    node.innerHTML = data[i];
+                    $$("#column")[0].appendChild(node.cloneNode(true)); 
+                }
+            },
+        });
+    }
+    function calculate(){
+        formData = new FormData();
+        var shpName = $$("#shpfile")[0].value;
+        var col = $$("#column").val();
+        formData.append("shp", shpName);
+        formData.append("col", col);
+        url = "/calc_entropy";
+        $$.ajax({
+            url: url,
+            type: "post",
+            data: formData,
+            dataType: "json",
+            processData:false,
+            contentType:false,
+            success: function(data){
+                console.log(data);
+                $$("#parse")[0].innerHTML =  data;
+                //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
+                //$$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=597&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+            },
+        });     
+    }
+    function clearChildren(list){
+        for(var i=0;i<list.length;i++){
+            childList = document.getElementById(list[i]).children;
+            for(var j=childList.length-1;j>0;j--){
+                document.getElementById(list[i]).removeChild(childList[j]);
+            }   
+        }
+    }
+    </script>
+
+</body>
+
+</html>

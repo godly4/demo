@@ -4,6 +4,7 @@ import os
 import re
 #import dbf
 import web
+import math
 import json
 import pysal
 import numpy as np
@@ -11,11 +12,12 @@ import shutil
 import subprocess
 from dbfpy.dbf import Dbf
 from config.setting import render
+from collections import defaultdict
 #from match import match, fileMatch 
 
-def getFileList():
+def getFileList(dirName='shp'):
     pwd = os.getcwd()
-    shpDir = pwd + "/static/files/shp"
+    shpDir = pwd + "/static/files/" + dirName
     fileList = os.listdir(shpDir)
     dbfList = []
     for f in fileList:
@@ -50,7 +52,8 @@ class NetAnalysis:
 
 class Entropy:
     def GET(self):
-        return render.entropy()
+        dbfList = getFileList("curemark")
+        return render.entropy(dbfList)
 
 class Parse:
     def POST(self):
@@ -68,7 +71,10 @@ class Upload:
 class Column:
     def POST(self):
         i = web.input()
-        path = os.getcwd() + "/static/files/shp/"+ i.name + ".dbf"
+        dirName = "shp"
+        if i.has_key('dirName'):
+            dirName = i.dirName
+        path = os.getcwd() + "/static/files/" + dirName + "/"+ i.name + ".dbf"
         db = pysal.open(path, "r")
         return json.dumps(db.header)
 
@@ -98,6 +104,83 @@ class Regress:
         ols = pysal.spreg.ols.OLS(y, X)
         print ols.summary
         return json.dumps(ols.summary)
+
+def getValue(lists, target):
+    min = 99999999
+    max = -99999999
+    sum = 0.0
+    for l in lists:
+        if l < min:
+            min = l
+        if l > max:
+            max = l
+        sum = sum + l
+    if target == "min":
+        return min
+    elif target == "max":
+        return max
+    else:
+        return sum
+
+class CalcEntropy:
+    def POST(self):
+        i = web.input()
+        shp = i.shp.encode('utf-8')
+        col = i.col
+        path = os.getcwd() + "/static/files/curemark/" + shp + ".dbf"
+        f = pysal.open(path, "r")
+        colData = {}
+        #唯一值A
+        dictA = {}
+        minA = {}
+        maxA = {}
+        for c in col.split(','):
+            colData[c] = f.by_col[c]
+            minA[c] = getValue(colData[c], "min")
+            maxA[c] = getValue(colData[c], "max")
+        for c in colData.keys():
+            dictA[c] = minA[c] / maxA[c] * 1.0
+        #新指标
+        newData = defaultdict(list)
+        for c in colData.keys():
+            for i in range(len(colData[c])):
+                colData[c][i] = ((colData[c][i] - minA[c]) / (maxA[c] - minA[c]) * 1.0) * (1 - dictA[c]) + dictA[c]
+                newData[c].append(colData[c][i])
+        #唯一值B
+        dictB = {}
+        for c in colData.keys():
+            dictB[c] = getValue(colData[c], "sum")
+        #新标准指标C
+        for c in colData.keys():
+            for i in range(len(colData[c])):
+                colData[c][i] = colData[c][i] * 1.0 / dictB[c]
+                colData[c][i] = colData[c][i] * math.log(colData[c][i])
+        # 数据K
+
+        k = 1 / math.log(len(colData[colData.keys()[0]]))
+        # hj
+        dictHj = {}
+        sumHj = 0
+        for c in colData.keys():
+            tmp = -1 * k * getValue(colData[c], "sum")
+            dictHj[c] = 1 - tmp
+            sumHj = sumHj + dictHj[c]
+        # wj
+        dictWj = {}
+        for c in colData.keys():
+            dictWj[c] = dictHj[c] / sumHj * 1.0
+        # 新的e
+        for c in colData.keys():
+            for i in range(len(colData[c])):
+                colData[c][i] = dictWj[c] * newData[c][i]
+        # 生成新列
+        newList = []
+        for i in range(len(colData[colData.keys()[0]])):
+            tmp = 0
+            for c in colData.keys():
+                tmp = tmp + colData[c][i]
+            newList.append(tmp)
+        print newList
 
 class Calc:
     def POST(self):
