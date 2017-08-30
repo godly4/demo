@@ -48,6 +48,10 @@ class NetAnalysis:
     def GET(self):
         return render.netAnalysis()
 
+class Entropy:
+    def GET(self):
+        return render.entropy()
+
 class Parse:
     def POST(self):
         i = web.input()

@@ -11,6 +11,7 @@ urls = (
     '/spatialGlobal', 'controllers.index.SpatialGlobal',
     '/getisLocal', 'controllers.index.GetisLocal',
     '/netAnalysis', 'controllers.index.NetAnalysis',
+    '/entropy', 'controllers.index.Entropy',
 )
 
 render = web.template.render("templates/")
