@@ -156,7 +156,6 @@ class CalcEntropy:
                 colData[c][i] = colData[c][i] * 1.0 / dictB[c]
                 colData[c][i] = colData[c][i] * math.log(colData[c][i])
         # 数据K
-
         k = 1 / math.log(len(colData[colData.keys()[0]]))
         # hj
         dictHj = {}
@@ -181,6 +180,31 @@ class CalcEntropy:
                 tmp = tmp + colData[c][i]
             newList.append(tmp)
         print newList
+        dbf =  Dbf(path, True) 
+        dbfNew = Dbf("resultEntropy.dbf", new=True) 
+        #add field
+        for fldName in dbf.fieldNames:
+            dbfNew.addField(
+                (fldName, "C", 15)
+            )
+        dbfNew.addField(
+            ("Entropy", "C", 15),
+        )
+        #add data
+        index = 0
+        for rec in dbf:
+            newRec = dbfNew.newRecord()
+            for fldName in dbf.fieldNames:
+                newRec[fldName] = rec[fldName]
+            newRec["Entropy"] = newList[index]
+            index += 1
+            newRec.store()
+        dbf.close()
+        dbfNew.close() 
+        # 传输至118机器
+        cmd = "scp resultEntropy.dbf Administrator@118.190.61.45:/C:/gisdata/" + shp + "/" + shp + ".dbf"
+        subprocess.call(cmd, shell=True)
+        os.remove("resultEntropy.dbf")
 
 class Calc:
     def POST(self):
