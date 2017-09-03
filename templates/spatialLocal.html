@@ -66,7 +66,7 @@ $def with (fileList)
                                     <a href="xy">区位熵</a>
                                 </li>
                                 <li>
-                                    <a href="spatialLocal">SP指数</a>
+                                    <a href="spIndex">SP指数</a>
                                 </li>
                             </ul> 
                         </li>
@@ -109,7 +109,7 @@ $def with (fileList)
                     <div style="padding-right:20px;padding-left:5px;padding-top:35px">
                         <label style="font-size:20px">原理介绍</label>
                         <hr>
-                        <h5>1234567</h5>
+                        <h5>给定一组要素（输入要素类）和一个分析字段（输入字段），聚类和异常值分析工具可识别具有高值或低值的要素的空间聚类。该工具还可识别空间异常值。为此，该工具计算 local Moran's I 值、z 得分、p 值和表示每个具有显著统计学意义的要素的聚类类型的编码。z 得分和 p 值表示计算出的指数值的统计显著性。</h5>
                     </div>
                     <div class="form-group" style="padding-right:20px;padding-left:5px;padding-top:35px">
                         <label style="font-size:20px" for="submitText">SHP文件</label>
@@ -197,7 +197,7 @@ $def with (fileList)
                 console.log(data);
                 //$$("#parse")[0].innerHTML =  data;
                 //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
-                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=597&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=400&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
             },
         });     
     }

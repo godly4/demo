@@ -52,8 +52,13 @@ class NetAnalysis:
 
 class Entropy:
     def GET(self):
-        dbfList = getFileList("curemark")
+        dbfList = getFileList("xzpj/xxs")
         return render.entropy(dbfList)
+
+class SpIndex:
+    def GET(self):
+        dbfList = getFileList("xzpj/sp")
+        return render.spIndex(dbfList)
 
 class Parse:
     def POST(self):
@@ -127,7 +132,7 @@ class CalcEntropy:
         i = web.input()
         shp = i.shp.encode('utf-8')
         col = i.col
-        path = os.getcwd() + "/static/files/curemark/" + shp + ".dbf"
+        path = os.getcwd() + "/static/files/xzpj/xxs/" + shp + ".dbf"
         f = pysal.open(path, "r")
         colData = {}
         #唯一值A
@@ -188,7 +193,7 @@ class CalcEntropy:
                 (fldName, "C", 15)
             )
         dbfNew.addField(
-            ("Entropy", "C", 15),
+            ("xxs", "C", 15),
         )
         #add data
         index = 0
@@ -196,7 +201,7 @@ class CalcEntropy:
             newRec = dbfNew.newRecord()
             for fldName in dbf.fieldNames:
                 newRec[fldName] = rec[fldName]
-            newRec["Entropy"] = newList[index]
+            newRec["xxs"] = newList[index]
             index += 1
             newRec.store()
         dbf.close()
@@ -205,6 +210,7 @@ class CalcEntropy:
         cmd = "scp resultEntropy.dbf Administrator@118.190.61.45:/C:/gisdata/" + shp + "/" + shp + ".dbf"
         subprocess.call(cmd, shell=True)
         os.remove("resultEntropy.dbf")
+        return json.dumps("OK")
 
 class Calc:
     def POST(self):

@@ -12,6 +12,7 @@ urls = (
     '/getisLocal', 'controllers.index.GetisLocal',
     '/netAnalysis', 'controllers.index.NetAnalysis',
     '/entropy', 'controllers.index.Entropy',
+    '/spIndex', 'controllers.index.SpIndex',
     '/calc_entropy', 'controllers.index.CalcEntropy',
 )
 

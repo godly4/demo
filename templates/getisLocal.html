@@ -66,7 +66,7 @@ $def with (fileList)
                                     <a href="xy">区位熵</a>
                                 </li>
                                 <li>
-                                    <a href="spatialLocal">SP指数</a>
+                                    <a href="spIndex">SP指数</a>
                                 </li>
                             </ul> 
                         </li>
@@ -197,7 +197,7 @@ $def with (fileList)
                 console.log(data);
                 //$$("#parse")[0].innerHTML =  data;
                 //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
-                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=597&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=400&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
             },
         });     
     }
