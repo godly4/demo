@@ -41,6 +41,11 @@ class GetisLocal:
         dbfList = getFileList()
         return render.getisLocal(dbfList)
 
+class Reg:
+    def GET(self):
+        dbfList = getFileList()
+        return render.regress(dbfList)
+
 class SpatialGlobal:
     def GET(self):
         dbfList = getFileList()
@@ -54,6 +59,11 @@ class Entropy:
     def GET(self):
         dbfList = getFileList("xzpj/xxs")
         return render.entropy(dbfList)
+
+class Lentropy:
+    def GET(self):
+        dbfList = getFileList("xzpj/qws")
+        return render.lentropy(dbfList)
 
 class SpIndex:
     def GET(self):
@@ -290,3 +300,102 @@ class Calc:
         subprocess.call(cmd, shell=True)
         shutil.make_archive("static/files/"+shp, "zip", root_dir="static/files/"+shp)
         return json.dumps(result)
+
+class CalcLentropy:
+    def POST(self):
+        i = web.input()
+        shp = i.shp.encode('utf-8')
+        colX = i.colX
+        colY = i.colY
+        path = os.getcwd() + "/static/files/xzpj/qws/" + shp + ".dbf"
+        f = pysal.open(path, "r")
+        yX = np.array(f.by_col[colX]).astype(np.float)
+        yY = np.array(f.by_col[colY]).astype(np.float)
+        print yX, yY
+        sumX = 0
+        sumY = 0
+        for i in range(len(yX)):
+            sumX += yX[i]
+            sumY += yY[i]
+        fenMu = sumX * 1.0 / sumY 
+        # 生成新列
+        newList = []
+        for i in range(len(yX)):
+            tmp = yX[i] * 1.0 / yY[i]
+            tmp = tmp / fenMu
+            newList.append(tmp)
+        print newList
+        dbf =  Dbf(path, True) 
+        dbfNew = Dbf("resultLentropy.dbf", new=True) 
+        #add field
+        for fldName in dbf.fieldNames:
+            dbfNew.addField(
+                (fldName, "C", 15)
+            )
+        dbfNew.addField(
+            ("qws", "C", 15),
+        )
+        #add data
+        index = 0
+        for rec in dbf:
+            newRec = dbfNew.newRecord()
+            for fldName in dbf.fieldNames:
+                newRec[fldName] = rec[fldName]
+            newRec["qws"] = newList[index]
+            index += 1
+            newRec.store()
+        dbf.close()
+        dbfNew.close() 
+        # 传输至118机器
+        cmd = "scp resultLentropy.dbf Administrator@118.190.61.45:/C:/gisdata/" + shp + "/" + shp + ".dbf"
+        subprocess.call(cmd, shell=True)
+        os.remove("resultLentropy.dbf")
+        return json.dumps("OK")
+
+
+class CalcSp:
+    def POST(self):
+        dictDis = defaultdict(dict)
+        yN = []
+        with open("/home/project/demo/controllers/city.csv", "r") as f:
+            line = f.readline().strip()
+            while line:
+                yN.append(line.strip())
+                line = f.readline().strip()
+        with open("/home/project/demo/controllers/distance.csv", "r") as f:
+            line = f.readline().strip()
+            while line:
+                lineSplit = line.split(',')
+                dis = lineSplit[-3]
+                start = lineSplit[-2]
+                end = lineSplit[-1]
+                dictDis[start][end] = dis
+                line = f.readline().strip()
+        #print dictDis
+        # 初始化距离矩阵
+        i = web.input()
+        shp = i.shp.encode('utf-8')
+        col = i.col
+        path = os.getcwd() + "/static/files/xzpj/sp/" + shp + ".dbf"
+        f = pysal.open(path, "r")
+        RDs = np.array(f.by_col[col]).astype(np.float)
+        sumAll = 0.0
+        for i in range(len(RDs)):
+            sumAll = sumAll + RDs[i]
+        percent = {}
+        for i in range(len(RDs)):
+            percent[yN[i]] = (RDs[i] * 1.0 / sumAll) * 1.0
+        sp = 0
+        for fi in range(len(RDs) - 1):
+            for sec in range(fi+1, len(RDs)):
+                start = yN[fi]
+                end = yN[sec]
+                perStart = (float)(percent[start])
+                perEnd = (float) (percent[end])
+                distance = (float)(dictDis[start][end])
+                print start, end, dictDis[start][end]
+                print perStart, perEnd
+                sp = sp + (perStart * perEnd * distance)
+
+        print sp
+        return json.dumps(sp)

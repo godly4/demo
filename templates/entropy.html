@@ -63,7 +63,7 @@ $def with (fileList)
                                     <a href="entropy">信息熵</a>
                                 </li>
                                 <li>
-                                    <a href="xy">区位熵</a>
+                                    <a href="lentropy">区位熵</a>
                                 </li>
                                 <li>
                                     <a href="spIndex">SP指数</a>
@@ -89,7 +89,7 @@ $def with (fileList)
                             <a href="forms.html"><i class="fa fa-edit fa-fw"></i> 相关模型<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="xx">回归</a>
+                                    <a href="reg">回归</a>
                                 </li>
                                 <li>
                                     <a href="netAnalysis">网络分析</a>
@@ -218,7 +218,7 @@ $def with (fileList)
                 console.log(data);
                 //$$("#parse")[0].innerHTML =  data;
                 //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
-                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=400&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=113.4791291877985,36.043080394287315,119.87112173089427,42.62158697235819&width=746&height=400&srs=EPSG:4326&format=application/openlayers' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>";
             },
         });     
     }

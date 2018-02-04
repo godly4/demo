@@ -109,27 +109,30 @@ $def with (fileList)
                     <div style="padding-right:20px;padding-left:5px;padding-top:35px">
                         <label style="font-size:20px">原理介绍</label>
                         <hr>
-                        <h5>空间自相关工具将返回五个值：Moran's I 指数、预期指数、方差、z 得分及 p 值。在给定一组要素及相关属性的情况下，该工具评估所表达的模式是聚类模式、离散模式还是随机模式。使用 z 得分或 p 值指示统计显著性时，如果 Moran's I 指数值为正则指示聚类趋势，如果 Moran's I 指数值为负则指示离散趋势。该工具通过计算 z 得分和 p 值来表示您是否可以拒绝零假设。此种情况下，零假设表示要素值随机分布于研究区域中。z 得分基于随机化零假设进行计算。输入字段应包含多种值。此统计数学方法要求待分析的变量存在一定程度的变化；例如，如果所有输入都是 1 便无法求解。如果要使用此工具分析事件数据的空间模式，应考虑聚合事件数据。优化的热点分析还可以用来分析事件数据的空间模式。</h5>
+                        <h5>回归分析（英语：Regression Analysis）是一种统计学上分析数据的方法，目的在于了解两个或多个变数间是否相关、相关方向与强度，并建立数学模型以便观察特定变数来预测研究者感兴趣的变数。 更具体的来说，回归分析可以帮助人们了解在只有一个自变量变化时因变量的变化量。</h5>
                     </div>
                     <div class="form-group" style="padding-right:20px;padding-left:5px;padding-top:35px">
-                        <label style="font-size:20px" for="submitText">文件名</label>
-                        <label style="font-size:20px;padding-left:48%">字段名</label>
-                        <hr/>
-                        <select id="shpfile" class="form-control" onchange="parseDBF(this)" style="width:45%;display:inline">
+                        <label style="font-size:20px" for="submitText">SHP文件</label>
+                        <select id="shpfileR" class="form-control" onchange="parseDBF(this)" style="margin:5px;20px">
                             <option value="noselect">---请选择---</option>
                             $for file in fileList:
-                                <option value="${file}">${file}</option>   
+                                <option value="${file}">${file}</option>
                         </select>
-                        <select id="column" class="form-control" style="width:45%;float:right;display:inline">
+                        <label style="font-size:20px;">字段名(Y)</label>
+                        <select id="columnY" class="form-control" style="margin:5px;20px">
                             <option value="noselect">---请选择---</option>
                         </select>
-                        <button class="btn btn-success" type="button" style="display: block;float: right;clear: both;margin-top: 20px;" onclick="calculate()">计算</button>
+                        <label style="font-size:20px;">字段名(X)</label>
+                        <select id="columnX" class="form-control" style="margin:5px;20px" multiple="multiple">
+                        </select>
+                        <hr/>
+                        <button class="btn btn-success" type="button" style="display: block;float: right;clear: both;margin-top: 20px;" onclick="regress()">计算</button>
                     </div>
                     <div  style="padding:5px;clear:both">
                         <label style="font-size:20px" for="parseText">解析结果</label>
                         <hr/>
                         <div id="parseDiv">
-                            <label id="parse" style="text-align:left"></label>
+                            <label id="parseR" style="text-align:left"></label>
                         </div>
                     </div>
                 </div>
@@ -167,6 +170,8 @@ $def with (fileList)
             contentType:false,
             beforeSend: function(){
                 var list = new Array();
+                list.push("columnY");
+                list.push("columnX");
                 clearChildren(list);
             },
             success: function(data){
@@ -174,18 +179,21 @@ $def with (fileList)
                     node = document.createElement("option");
                     node.setAttribute("value",data[i]);
                     node.innerHTML = data[i];
-                    $$("#column")[0].appendChild(node.cloneNode(true)); 
+                    $$("#columnY")[0].appendChild(node.cloneNode(true));
+                    $$("#columnX")[0].appendChild(node.cloneNode(true));
                 }
             },
         });
     }
-    function calculate(){
+    function regress(){
         formData = new FormData();
-        var shpName = $$("#shpfile")[0].value;
-        var col = $$("#column")[0].value;
+        var shpName = $$("#shpfileR")[0].value;
+        var Y = $$("#columnY")[0].value;
+        var X = $$("#columnX").val();
         formData.append("shp", shpName);
-        formData.append("col", col);
-        url = "/calculate";
+        formData.append("colY", Y);
+        formData.append("colX", X);
+        url = "/regress";
         $$.ajax({
             url: url,
             type: "post",
@@ -195,9 +203,29 @@ $def with (fileList)
             contentType:false,
             success: function(data){
                 console.log(data);
-                $$("#parse")[0].innerHTML =  data;
+                $$("#parseR")[0].innerHTML =  data.replace(/\n/g, "<br/>");
+            },
+        });
+    }
+    function calculate(){
+        formData = new FormData();
+        var shpName = $$("#shpfile")[0].value;
+        var col = $$("#column").val();
+        formData.append("shp", shpName);
+        formData.append("col", col);
+        url = "/calc";
+        $$.ajax({
+            url: url,
+            type: "post",
+            data: formData,
+            dataType: "json",
+            processData:false,
+            contentType:false,
+            success: function(data){
+                console.log(data);
+                //$$("#parse")[0].innerHTML =  data;
                 //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
-                //$$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=400&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=113.4791291877985,36.043080394287315,119.87112173089427,42.62158697235819&width=746&height=400&srs=EPSG:4326&format=application/openlayers' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>";
             },
         });     
     }

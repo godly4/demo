@@ -63,7 +63,7 @@ $def with (fileList)
                                     <a href="entropy">信息熵</a>
                                 </li>
                                 <li>
-                                    <a href="xy">区位熵</a>
+                                    <a href="lentropy">区位熵</a>
                                 </li>
                                 <li>
                                     <a href="spIndex">SP指数</a>
@@ -89,7 +89,7 @@ $def with (fileList)
                             <a href="forms.html"><i class="fa fa-edit fa-fw"></i> 相关模型<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="xx">回归</a>
+                                    <a href="reg">回归</a>
                                 </li>
                                 <li>
                                     <a href="netAnalysis">网络分析</a>
@@ -139,7 +139,7 @@ j 含义与前
                             $for file in fileList:
                                 <option value="${file}">${file}</option>   
                         </select>
-                        <select id="column" class="form-control" style="width:45%;float:right;display:inline" multiple="multiple">
+                        <select id="column" class="form-control" style="width:45%;float:right;display:inline">
                         </select>
                         <button class="btn btn-success" type="button" style="display: block;float: right;clear: both;margin-top: 20px;" onclick="calculate()">计算</button>
                     </div>
@@ -176,7 +176,7 @@ j 含义与前
         url = "/column";
         formData = new FormData();
         formData.append("name", that.value);
-        formData.append("dirName", "xzpj/xxs");
+        formData.append("dirName", "xzpj/sp");
         $$.ajax({
             url: url,
             type: "post",
@@ -192,26 +192,10 @@ j 含义与前
                 for(i=0;i<data.length;i++){
                     node = document.createElement("option");
                     node.setAttribute("value",data[i]);
-                    if(data[i] == "mobile")
-                        node.innerHTML = "移动电话年末用户数万户";
-                    else if(data[i] == "IOmoney")
-                        node.innerHTML = "进出口总额亿美元";
-                    else if(data[i] == "TechMoney")
-                        node.innerHTML = "人均财政性科技经费支出元";
-                    else if(data[i] == "CollegeStu")
-                        node.innerHTML = "每万人在校大学生数";
-                    else if(data[i] == "TerIndRate")
-                        node.innerHTML = "第三产业贡献率";
-                    else if(data[i] == "ForComp")
-                        node.innerHTML = "规模以上外商（包括港澳台）投资工业企业单位数";
-                    else if(data[i] == "TechPerson")
-                        node.innerHTML = "科技从业人员数";
-                    else if(data[i] == "TechContra")
-                        node.innerHTML = "技术合同成交额亿元";
-                    else if(data[i] == "RDmoney")
-                        node.innerHTML = "研究与试验发展（R&D）经费亿元";
-                    else if(data[i] == "Patent")
-                        node.innerHTML = "专利申请授权量";
+                    if(data[i] == "RD")
+                        node.innerHTML = "R&D经费支出（万元）";
+                    else if(data[i] == "GDP")
+                        node.innerHTML = "地区生产总值（万元）";
                     else
                         node.innerHTML = data[i];
                     $$("#column")[0].appendChild(node.cloneNode(true)); 
@@ -225,7 +209,7 @@ j 含义与前
         var col = $$("#column").val();
         formData.append("shp", shpName);
         formData.append("col", col);
-        url = "/calc_entropy";
+        url = "/calc_sp";
         $$.ajax({
             url: url,
             type: "post",
@@ -235,9 +219,7 @@ j 含义与前
             contentType:false,
             success: function(data){
                 console.log(data);
-                //$$("#parse")[0].innerHTML =  data;
-                //$$("#parse")[0].innerHTML += "<br><a href='http://localhost:9000/static/files/"+shpName+".zip'>Local Moran文件</a>";
-                $$("#parse")[0].innerHTML = "<br><iframe src='http://118.190.61.45:8080/geoserver/cxdt/wms?service=WMS&version=1.1.0&request=GetMap&layers=cxdt:"+shpName+"&styles=&bbox=115.44193725534438,39.45511491940675,117.50891227339419,41.06256199712871&width=768&height=400&srs=EPSG:4326&format=application/openlayers#toggle' width=768 height=597 overflow='scroll' scrolling='yes'></iframe>"
+                $$("#parse")[0].innerHTML =  "SP指数为: " + data;
             },
         });     
     }

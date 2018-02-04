@@ -6,14 +6,18 @@ urls = (
     '/upload', 'controllers.index.Upload',
     '/column', 'controllers.index.Column',
     '/calculate', 'controllers.index.Calc',
+    '/reg', 'controllers.index.Reg',
     '/regress', 'controllers.index.Regress',
     '/spatialLocal', 'controllers.index.SpatialLocal',
     '/spatialGlobal', 'controllers.index.SpatialGlobal',
     '/getisLocal', 'controllers.index.GetisLocal',
     '/netAnalysis', 'controllers.index.NetAnalysis',
     '/entropy', 'controllers.index.Entropy',
+    '/lentropy', 'controllers.index.Lentropy',
     '/spIndex', 'controllers.index.SpIndex',
     '/calc_entropy', 'controllers.index.CalcEntropy',
+    '/calc_lentropy', 'controllers.index.CalcLentropy',
+    '/calc_sp', 'controllers.index.CalcSp',
 )
 
 render = web.template.render("templates/")
