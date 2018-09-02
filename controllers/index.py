@@ -105,7 +105,6 @@ class Regress:
         shp = i.shp.encode('utf-8')
         colY = i.colY.encode('utf-8')
         colX = i.colX.encode('utf-8')
-        print colX
         # start execute
         path = os.getcwd() + "/static/files/shp/"+ shp + ".dbf"
         f = pysal.open(path, "r")
@@ -114,9 +113,12 @@ class Regress:
         X = []
         for elem in colX.split(','):
             X.append(f.by_col[elem])
+        print X
         X = np.array(X).T
         X = X.astype(np.float)
+        print X
         ols = pysal.spreg.ols.OLS(y, X)
+        print y
         print ols.summary
         return json.dumps(ols.summary)
 

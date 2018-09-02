@@ -18,6 +18,12 @@ urls = (
     '/calc_entropy', 'controllers.index.CalcEntropy',
     '/calc_lentropy', 'controllers.index.CalcLentropy',
     '/calc_sp', 'controllers.index.CalcSp',
+    '/regressData', 'controllers.tech.RegressData',
+    '/regressColumn', 'controllers.tech.RegressColumn',
+    '/regressAnalysis', 'controllers.tech.RegressAnalysis',
+    '/resourceList', 'controllers.tech.ResourceList',
+    '/resourceType', 'controllers.tech.ResourceType',
+    '/aggregation', 'controllers.tech.Aggregation',
 )
 
 render = web.template.render("templates/")
