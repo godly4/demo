@@ -44,20 +44,20 @@ class ResourceType:
     def POST(self):
         data = web.input()
         name = data.name
-        #with open("/home/project/demo/controllers/company.csv", "r") as f:
-        #    line = f.readline()
-        #    lineSplit = line.split('^_^')
-        #    index = lineSplit.index('学校属性')
-        #    indexStat = lineSplit.index('高校名称')
-        #    statList = lineSplit[indexStat+1:-1]
-        #    typeList = set()
-        #    while line:
-        #        line = f.readline()
-        #        lineSplit = line.split('^_^')
-        #        if len(lineSplit) > index:
-        #            typeList.add(lineSplit[index])
-        #    f.close()
-        #    return json.dumps({"typeList":list(typeList),"statList":statList})
+        with open("/home/project/demo/controllers/company.csv", "r") as f:
+            line = f.readline()
+            statList = []
+            typeList = set()
+            while line:
+                lineSplit = line.split(',')
+                cType = lineSplit[2]
+                #长度过长
+                if len(cType) >= 60:
+                    cType = cType[:33] + "..."
+                typeList.add(cType)
+                line = f.readline()
+            f.close()
+            return json.dumps({"typeList":list(typeList),"statList":statList})
         return json.dumps({"typeList":[],"statList":[]})
 
 def takeSecond(elem):
@@ -90,47 +90,56 @@ class Aggregation:
         zoom = float(data.zoom)
         #河北省:13
         result1 = {}
+        people1 = {}
         #河北省-石家庄:1301
         result2 = {}
+        people2 = {}
         #石家庄-长安区:130102
         result3 = {}
-        with open("/home/project/demo/controllers/school.csv", "r") as f:
+        people3 = {} 
+        #先统计出各个地方的人数
+        with open("/home/project/demo/controllers/people.csv", "r") as f:
             line = f.readline()
-            lineSplit = line.split('^_^')
-            index = lineSplit.index('学校属性')
-            try:
-                indexColumn = lineSplit.index(column)
-            except:
-                indexColumn = 1
             while line:
-                line = f.readline()
-                if line.strip() == "":
-                    break
-                code3 = line.split('^_^')[5]
+                lineSplit = line.split(',')
+                code3 = line.split(',')[-4].strip()
                 code2 = code3[:4] + "00"
                 code1 = code3[:2] + "0000"
-                lineType = line.split('^_^')[index]
-                try:
-                    lineColumn = int(line.split('^_^')[indexColumn])
-                except:
-                    lineColumn = 0
-                if resourceType == lineType:
-                    #计数
-                    if action == "sum": 
-                        result1[code1] = result1.get(code1, 0)
-                        result1[code1] = result1[code1] + 1
-                        result2[code2] = result2.get(code2, 0)
-                        result2[code2] = result2[code2] + 1
-                        result3[code3] = result3.get(code3, 0)
-                        result3[code3] = result3[code3] + 1
-                    #统计
-                    elif action == "stat":
-                        result1[code1] = result1.get(code1, 0)
-                        result1[code1] = result1[code1] + int(lineColumn)
-                        result2[code2] = result2.get(code2, 0)
-                        result2[code2] = result2[code2] + int(lineColumn)
-                        result3[code3] = result3.get(code3, 0)
-                        result3[code3] = result3[code3] + int(lineColumn)
+                people = int(line.split(',')[-2].strip())
+                people1[code1] = people1.get(code1, 0)
+                people1[code1] = people1[code1] + people
+                people2[code2] = people2.get(code2, 0)
+                people2[code2] = people2[code2] + people
+                people3[code3] = people3.get(code3, 0)
+                people3[code3] = people3[code3] + people
+                line = f.readline()
+
+        #统计公司个数 
+        with open("/home/project/demo/controllers/company.csv", "r") as f:
+            line = f.readline()
+            while line:
+                if line.strip() == "":
+                    break
+                code3 = line.split(',')[-2].strip()
+                code2 = code3[:4] + "00"
+                code1 = code3[:2] + "0000"
+                #计数
+                if action == "sum": 
+                    result1[code1] = result1.get(code1, 0)
+                    result1[code1] = result1[code1] + 1
+                    result2[code2] = result2.get(code2, 0)
+                    result2[code2] = result2[code2] + 1
+                    result3[code3] = result3.get(code3, 0)
+                    result3[code3] = result3[code3] + 1
+                #人均效率
+                elif action == "aver":
+                    result1[code1] = result1.get(code1, 0)
+                    result1[code1] = result1[code1] + 1.0/people1[code1]
+                    result2[code2] = result2.get(code2, 0)
+                    result2[code2] = result2[code2] + 1.0/people2[code2]
+                    result3[code3] = result3.get(code3, 0)
+                    result3[code3] = result3[code3] + 1.0/people3[code3]
+                line = f.readline()
         result = []
         #北京市、河北省
         if zoom < 8:
@@ -141,7 +150,7 @@ class Aggregation:
             result = process(result3) 
         else:
             print result3
-            result = process(result3)    
+            result = process(result3)  
         return json.dumps(result)
 
 class Test:
