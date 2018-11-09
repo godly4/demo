@@ -37,27 +37,28 @@ class RegressAnalysis:
         
 class ResourceList:
     def GET(self):
-        data = ['高新技术企业']
+        data = ['北京市高新技术企业', '京津冀国家高新技术企业']
         return json.dumps(data)
 
 class ResourceType:
     def POST(self):
         data = web.input()
         name = data.name
-        with open("/home/project/demo/controllers/company.csv", "r") as f:
-            line = f.readline()
-            statList = []
-            typeList = set()
-            while line:
-                lineSplit = line.split(',')
-                cType = lineSplit[2]
-                #长度过长
-                if len(cType) >= 60:
-                    cType = cType[:33] + "..."
-                typeList.add(cType)
+        if name.encode("utf-8") == "北京市高新技术企业":
+            with open("/home/project/demo/controllers/"+name+".csv", "r") as f:
                 line = f.readline()
-            f.close()
-            return json.dumps({"typeList":list(typeList),"statList":statList})
+                statList = []
+                typeList = set()
+                while line:
+                    lineSplit = line.split(',')
+                    cType = lineSplit[2]
+                    #长度过长
+                    if len(cType) >= 60:
+                        cType = cType[:33] + "..."
+                    typeList.add(cType)
+                    line = f.readline()
+                f.close()
+                return json.dumps({"typeList":list(typeList),"statList":statList})
         return json.dumps({"typeList":[],"statList":[]})
 
 def takeSecond(elem):
@@ -115,12 +116,15 @@ class Aggregation:
                 line = f.readline()
 
         #统计公司个数 
-        with open("/home/project/demo/controllers/company.csv", "r") as f:
+        with open("/home/project/demo/controllers/"+resource+".csv", "r") as f:
             line = f.readline()
             while line:
                 if line.strip() == "":
                     break
-                code3 = line.split(',')[-2].strip()
+                if resource.encode("utf-8") == "北京市高新技术企业":
+                    code3 = line.split(',')[-2].strip()
+                else:
+                    code3 = line.split(',')[-4].strip()
                 code2 = code3[:4] + "00"
                 code1 = code3[:2] + "0000"
                 #计数
@@ -134,11 +138,11 @@ class Aggregation:
                 #人均效率
                 elif action == "aver":
                     result1[code1] = result1.get(code1, 0)
-                    result1[code1] = result1[code1] + 1.0/people1[code1]
+                    result1[code1] = result1[code1] + 10000.0/people1[code1]
                     result2[code2] = result2.get(code2, 0)
-                    result2[code2] = result2[code2] + 1.0/people2[code2]
+                    result2[code2] = result2[code2] + 10000.0/people2[code2]
                     result3[code3] = result3.get(code3, 0)
-                    result3[code3] = result3[code3] + 1.0/people3[code3]
+                    result3[code3] = result3[code3] + 10000.0/people3[code3]
                 line = f.readline()
         result = []
         #北京市、河北省
