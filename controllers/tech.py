@@ -17,6 +17,9 @@ from config.setting import render
 from collections import defaultdict
 #from match import match, fileMatch 
 
+columnMap = {"Y":"技术合同成交额(亿元)","X1":"专利申请数","X2":"专利授权数","x3":"地方财政科技拨款(万元)","x4":"地方财政教育拨款(万元)",\
+"x5":"R&D经费支出(万元)","x6":"实际利用外商直接投资额(万美元)","x7":"常住人口(万人)","x8":"R&D研究人员数"}
+
 class RegressData:
     def GET(self):
         data = ['2013', '2014', '2015', '2016']
@@ -25,15 +28,65 @@ class RegressData:
 class RegressColumn:
     def POST(self):
         data = web.input()
-        column = ['地区','论文','获奖','科研院所','大学','企业研发机构','研发经费','国家补助']
-        return json.dumps(column)
+        dirName = "shp"
+        path = os.getcwd() + "/static/files/" + dirName + "/"+ "olsdata" + ".dbf"
+        db = pysal.open(path, "r")
+        heads = db.header
+        ret = []
+        for i in range(len(heads)):
+            if heads[i].startswith('Y') or heads[i].startswith('y') \
+                or heads[i].startswith('x') or heads[i].startswith('X'):
+                ret.append(heads[i]+"_"+columnMap[heads[i]].decode("utf8"))
+        return json.dumps(ret)
 
 class RegressAnalysis:
     def POST(self):
         data = web.input()
         name = data.name
-        X = name.X
-        Y = name.Y
+        colX = data.X
+        colY = data.Y
+        # start execute
+        path = os.getcwd() + "/static/files/shp/"+ "olsdata" + ".dbf"
+        f = pysal.open(path, "r")
+        y = np.array(f.by_col[colY]).astype(np.float)
+        y.shape = (len(f.by_col[colY]), 1)
+        X = []
+        #加载地址
+        district = []
+        district.append(f.by_col["gdcode"])
+        for elem in colX.split(','):
+            X.append(f.by_col[elem])
+        #print X
+        X = np.array(X).T
+        X = X.astype(np.float)
+        #print X
+        ols = pysal.spreg.ols.OLS(y, X)
+        #print y
+        betas = ols.betas
+        retDict = {}
+        result = "Y = "
+        #参数列表
+        factors = []
+        for i in range(len(colX.split(','))):
+            result += "(" + str(betas[i+1][0]) + ")" + " * " + "X" + str(i+1) + " + "
+            factors.append(betas[i+1][0])
+        result = result[:-2]
+        if str(betas[0][0])[0] == "-":
+            result += " - " + str(betas[0][0])[1:]
+        else:
+            result += " + " + str(betas[0][0])
+        factors.append(betas[0][0])
+        retDict["result"] = result
+        retDict["table"] = {}
+        retDict["betas"] = factors
+        for i in range(len(X)):
+            tmp = []
+            tmp.append(y[i][0])
+            for j in range(len(X[i])):
+                tmp.append(X[i][j])
+            retDict["table"][district[0][i]] = tmp
+        print retDict 
+        return json.dumps(retDict)
         
 class ResourceList:
     def GET(self):
@@ -58,6 +111,7 @@ class ResourceType:
                     typeList.add(cType)
                     line = f.readline()
                 f.close()
+                return json.dumps({"typeList":list(typeList),"statList":statList})
                 return json.dumps({"typeList":list(typeList),"statList":statList})
         return json.dumps({"typeList":[],"statList":[]})
 
@@ -161,4 +215,3 @@ class Test:
     def GET(self):
         print "start"
         time.sleep(20)
-        print "end"
