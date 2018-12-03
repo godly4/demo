@@ -60,15 +60,18 @@ class RegressAnalysis:
         X = np.array(X).T
         X = X.astype(np.float)
         #print X
-        ols = pysal.spreg.ols.OLS(y, X)
+        #取对数,符合柯布—道格拉斯生产函数格式
+        logY = np.log(y)
+        logX = np.log(X)
+        ols = pysal.spreg.ols.OLS(logY, logX)
         #print y
         betas = ols.betas
         retDict = {}
-        result = "Y = "
+        result = "logY = "
         #参数列表
         factors = []
         for i in range(len(colX.split(','))):
-            result += "(" + str(betas[i+1][0]) + ")" + " * " + "X" + str(i+1) + " + "
+            result += "(" + str(betas[i+1][0]) + ")" + " * " + "logX" + str(i+1) + " + "
             factors.append(betas[i+1][0])
         result = result[:-2]
         if str(betas[0][0])[0] == "-":
