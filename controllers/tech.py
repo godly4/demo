@@ -79,12 +79,19 @@ class RegressAnalysis:
         retDict["result"] = result
         retDict["table"] = {}
         retDict["betas"] = factors
+        #读取编号
+        with open("/home/project/demo/controllers/map.csv","r") as f:
+            data = f.read()
+        dataSplit = data.split('\n')
         for i in range(len(X)):
             tmp = []
             tmp.append(y[i][0])
             for j in range(len(X[i])):
                 tmp.append(X[i][j])
-            retDict["table"][district[0][i]] = tmp
+            for d in dataSplit:
+                if district[0][i] == d.split(" ")[0]: 
+                    retDict["table"][d.split(" ")[1]] = tmp
+                    break
         print retDict 
         return json.dumps(retDict)
         
