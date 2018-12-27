@@ -25,6 +25,8 @@ urls = (
     '/resourceType', 'controllers.tech.ResourceType',
     '/aggregation', 'controllers.tech.Aggregation',
     '/testList', 'controllers.tech.Test',
+    '/synergyData', 'controllers.tech.SynergyData',
+    '/synergyAnalysis', 'controllers.tech.Synergy',
 )
 
 render = web.template.render("templates/")

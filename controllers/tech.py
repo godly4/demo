@@ -20,6 +20,11 @@ from collections import defaultdict
 columnMap = {"Y":"技术合同成交额(亿元)","X1":"专利申请数","X2":"专利授权数","x3":"地方财政科技拨款(万元)","x4":"地方财政教育拨款(万元)",\
 "x5":"R&D经费支出(万元)","x6":"实际利用外商直接投资额(万美元)","x7":"常住人口(万人)","x8":"R&D研究人员数"}
 
+class SynergyData:
+    def GET(self):
+        data = {"company":["京津冀企业数据"],"industry":["京津冀科研机构数据"]}
+        return json.dumps(data)
+
 class RegressData:
     def GET(self):
         data = ['2016']
@@ -143,6 +148,85 @@ def process(result):
 
     ret.sort(key=takeSecond,reverse=True)
     return ret
+
+class Synergy:
+    def POST(self):
+        data = web.input()
+        company = data.company
+        industry = data.industry
+        codeSet = []
+        #北京、天津统计到区--全部六位代码
+        #河北统计到地级市--统计前四位代码
+        #企业合并数据
+        #cFile = "/home/project/demo/controllers/" + company + ".csv"
+        cFile = "/home/project/demo/static/files/高新技术企业-电子信息技术-京津冀geocode.csv" 
+        cResult = {}
+        cMin = 99999999
+        cMax = 0
+        f = open(cFile, "r")
+        line = f.readline()
+        while line:
+            lineSplit = line.split(',')
+            if len(lineSplit) >= 2 and len(lineSplit[-2]) == 6:
+                gdcode = str(lineSplit[-2])
+                if gdcode[:2] == "13":
+                    gdcode = gdcode[:4] + "00"
+                codeSet.append(gdcode)
+                cResult[gdcode] = cResult.get(gdcode, 0)
+                cResult[gdcode] = cResult[gdcode] + 1
+                if cResult[gdcode] > cMax:
+                    cMax = cResult[gdcode]
+                if cResult[gdcode] < cMin:
+                    cMin = cResult[gdcode]
+            line = f.readline()
+        f.close()
+        #科研机构合并数据
+        #iFile = "/home/project/demo/controllers/" + industry + ".csv"
+        iFile = "/home/project/demo/static/files/科研院所-电子信息技术-京津冀geocode.csv"
+        iResult = {}
+        iMin = 999999999
+        iMax = 0
+        f = open(iFile, "r")
+        line = f.readline()
+        while line:
+            lineSplit = line.split(',')
+            if len(lineSplit) >= 2 and len(lineSplit[-2]) == 6:
+                gdcode = str(lineSplit[-2])
+                if gdcode[:2] == "13":
+                    gdcode = gdcode[:4] + "00"
+                codeSet.append(gdcode)
+                iResult[gdcode] = iResult.get(gdcode, 0)
+                iResult[gdcode] = iResult[gdcode] + 1
+                if iResult[gdcode] > iMax:
+                    iMax = iResult[gdcode]
+                if iResult[gdcode] < cMin:
+                    iMin = iResult[gdcode]
+            line = f.readline()
+        f.close()
+        codeSet = set(codeSet)
+        #测试数据
+        retDict = {}
+        retDict["table"] = {}
+        f = open("/home/project/demo/controllers/map.csv", "r")
+        line = f.readline()
+        dd = {}
+        while line:
+            lineSplit = line.split()
+            dd[lineSplit[0]] = lineSplit[1]
+            line = f.readline()
+        f.close()
+        for gdcode in codeSet:
+            district = dd.get(gdcode) 
+            retDict["table"][district] = retDict["table"].get(district,[])
+            cValue = cResult.get(gdcode, 0)
+            iValue = iResult.get(gdcode, 0)
+            cTmp = (cValue - cMin) * 1.0 / (cMax - cMin)
+            iTmp = (iValue - iMin) * 1.0 / (iMax - iMin)
+            print gdcode, cTmp, iTmp
+            retDict["table"][district].append(cResult.get(gdcode,0))
+            retDict["table"][district].append(iResult.get(gdcode,0))
+            retDict["table"][district].append(round(2 * math.sqrt((cTmp * iTmp / ((cTmp + iTmp) * (cTmp + iTmp)))), 2))
+        return json.dumps(retDict)
 
 class Aggregation:
     def GET(self):
