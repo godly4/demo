@@ -174,12 +174,13 @@ class Synergy:
                 codeSet.append(gdcode)
                 cResult[gdcode] = cResult.get(gdcode, 0)
                 cResult[gdcode] = cResult[gdcode] + 1
-                if cResult[gdcode] > cMax:
-                    cMax = cResult[gdcode]
-                if cResult[gdcode] < cMin:
-                    cMin = cResult[gdcode]
             line = f.readline()
         f.close()
+        for gdcode in codeSet:
+            if cResult[gdcode] > cMax:
+                cMax = cResult[gdcode]
+            if cResult[gdcode] < cMin:
+                cMin = cResult[gdcode]
         #科研机构合并数据
         #iFile = "/home/project/demo/controllers/" + industry + ".csv"
         iFile = "/home/project/demo/static/files/科研院所-电子信息技术-京津冀geocode.csv"
@@ -197,12 +198,13 @@ class Synergy:
                 codeSet.append(gdcode)
                 iResult[gdcode] = iResult.get(gdcode, 0)
                 iResult[gdcode] = iResult[gdcode] + 1
-                if iResult[gdcode] > iMax:
-                    iMax = iResult[gdcode]
-                if iResult[gdcode] < cMin:
-                    iMin = iResult[gdcode]
             line = f.readline()
         f.close()
+        for gdcode in codeSet:
+            if gdcode in iResult and iResult[gdcode] > iMax:
+                iMax = iResult[gdcode]
+            if gdcode in iResult and iResult[gdcode] < iMin:
+                iMin = iResult[gdcode]
         codeSet = set(codeSet)
         #测试数据
         retDict = {}
@@ -216,13 +218,15 @@ class Synergy:
             line = f.readline()
         f.close()
         for gdcode in codeSet:
+            if gdcode == "gdcode":
+                continue
             district = dd.get(gdcode) 
             retDict["table"][district] = retDict["table"].get(district,[])
-            cValue = cResult.get(gdcode, 0)
-            iValue = iResult.get(gdcode, 0)
+            cValue = cResult.get(gdcode, cMin)
+            iValue = iResult.get(gdcode, iMin)
             cTmp = (cValue - cMin) * 1.0 / (cMax - cMin)
             iTmp = (iValue - iMin) * 1.0 / (iMax - iMin)
-            print gdcode, cTmp, iTmp
+            print gdcode, iTmp, cTmp
             retDict["table"][district].append(cResult.get(gdcode,0))
             retDict["table"][district].append(iResult.get(gdcode,0))
             retDict["table"][district].append(round(2 * math.sqrt((cTmp * iTmp / ((cTmp + iTmp) * (cTmp + iTmp)))), 2))
