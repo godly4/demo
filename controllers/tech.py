@@ -13,6 +13,7 @@ import numpy as np
 import shutil
 import subprocess
 import urllib2
+import collections
 from dbfpy.dbf import Dbf
 from config.setting import render
 from collections import defaultdict
@@ -207,9 +208,10 @@ class Synergy:
             if gdcode in iResult and iResult[gdcode] < iMin:
                 iMin = iResult[gdcode]
         codeSet = set(codeSet)
+        codeSet = sorted(codeSet)
         #测试数据
         retDict = {}
-        retDict["table"] = {}
+        retDict["table"] = collections.OrderedDict()
         f = open("/home/project/demo/controllers/map.csv", "r")
         line = f.readline()
         dd = {}
@@ -228,9 +230,19 @@ class Synergy:
             cTmp = (cValue - cMin) * 1.0 / (cMax - cMin)
             iTmp = (iValue - iMin) * 1.0 / (iMax - iMin)
             print "{},{},{}".format(gdcode, iTmp, cTmp)
+            tValue = 0.8 * iTmp + 0.2 * cTmp
             retDict["table"][district].append(cResult.get(gdcode,0))
             retDict["table"][district].append(iResult.get(gdcode,0))
-            retDict["table"][district].append(round(2 * math.sqrt((cTmp * iTmp / ((cTmp + iTmp) * (cTmp + iTmp)))), 2))
+            CRet = round(2 * math.sqrt((cTmp * iTmp / ((cTmp + iTmp) * (cTmp + iTmp)))), 2)
+            retDict["table"][district].append(CRet)
+            DRet = round(math.sqrt(CRet * tValue), 2)
+            retDict["table"][district].append(DRet)
+            if DRet >= 0 and DRet <= 0.2:
+                retDict["table"][district].append("低度协调")
+            elif DRet > 0.2 and DRet <= 0.5:
+                retDict["table"][district].append("中度协调")
+            else:
+                retDict["table"][district].append("高度协调")
         return json.dumps(retDict)
 
 class Aggregation:
