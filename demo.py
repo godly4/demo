@@ -27,6 +27,7 @@ urls = (
     '/testList', 'controllers.tech.Test',
     '/synergyData', 'controllers.tech.SynergyData',
     '/synergyAnalysis', 'controllers.tech.Synergy',
+    '/regressUpload', 'controllers.tech.RegressUpload',
 )
 
 render = web.template.render("templates/")

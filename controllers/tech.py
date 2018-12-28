@@ -4,6 +4,7 @@ import os
 import re
 #import dbf
 import web
+import uuid
 import math
 import time
 import json
@@ -226,7 +227,7 @@ class Synergy:
             iValue = iResult.get(gdcode, iMin)
             cTmp = (cValue - cMin) * 1.0 / (cMax - cMin)
             iTmp = (iValue - iMin) * 1.0 / (iMax - iMin)
-            print gdcode, iTmp, cTmp
+            print "{},{},{}".format(gdcode, iTmp, cTmp)
             retDict["table"][district].append(cResult.get(gdcode,0))
             retDict["table"][district].append(iResult.get(gdcode,0))
             retDict["table"][district].append(round(2 * math.sqrt((cTmp * iTmp / ((cTmp + iTmp) * (cTmp + iTmp)))), 2))
@@ -283,10 +284,7 @@ class Aggregation:
             while line:
                 if line.strip() == "":
                     break
-                if resource.encode("utf-8") == "北京市高新技术企业":
-                    code3 = line.split(',')[-2].strip()
-                else:
-                    code3 = line.split(',')[-4].strip()
+                code3 = line.split(',')[-2].strip()
                 code2 = code3[:4] + "00"
                 code1 = code3[:2] + "0000"
                 #计数
@@ -332,3 +330,15 @@ class Test:
     def GET(self):
         print "start"
         time.sleep(20)
+
+class RegressUpload:
+    def POST(self):
+        x = web.input(myfile={})
+        name = str(uuid.uuid1())
+        fileName = "/home/project/demo/controllers/"+name+".csv"
+        if 'myfile' in x: # to check if the file-object is created
+            content = x.myfile.file.read() # writes the uploaded file to the newly created file.
+            f = open(fileName, "w")
+            f.write(content)
+            f.close()
+        return name
